@@ -1,0 +1,74 @@
+<html><body>
+  Navigate map or <a href = "javascript:navigator.geolocation.getCurrentPosition(setUserPosition);">go to my location</a>: <br/>
+  <div id="mapdiv"></div>
+  <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+  <script>
+    map = new OpenLayers.Map("mapdiv");
+
+    map.addLayer(new OpenLayers.Layer.OSM());
+
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+
+    centerAt(-122.3086, 47.6410, /* showBlueDot= */ false);
+    addFeatures(-122.3086, 47.6410);
+    map.events.register('moveend', map, onMoveEnd);
+
+    /////////////////////////
+    // Function definitions:
+    /////////////////////////
+
+    function setUserPosition(position) {
+      centerAt(position.coords.longitude, position.coords.latitude, /* showBlueDot= */ true);
+      addFeatures(position.coords.longitude, position.coords.latitude);
+    }
+
+    function centerAt(lon, lat, showBlueDot) {
+        var lonLat = new OpenLayers.LonLat(lon, lat)
+                .transform(
+		                new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
+		                map.getProjectionObject()); // to Spherical Mercator Projection.
+          
+        var zoom=16;
+        map.setCenter (lonLat, zoom);
+        
+        if (showBlueDot) {
+            var blueDotIcon = new OpenLayers.Icon('bluedot.png');
+            markers.addMarker(new OpenLayers.Marker(lonLat, blueDotIcon));
+        }
+    }
+
+    function onMoveEnd() {
+        var lonLat = map.getCenter()
+          .transform(
+            map.getProjectionObject(), // from Spherical Mercator Projection
+            new OpenLayers.Projection("EPSG:4326"), // to WGS 1984
+            );
+
+    	addFeatures(lonLat.lon, lonLat.lat);
+    }
+
+    function addFeatures(lon, lat) {
+        // Create a connection to the file.
+        var Connect = new XMLHttpRequest();
+        // Define which file to open and
+        // send the request.
+        Connect.open("GET", "https://nominatim.openstreetmap.org/search?q=drinking+water+near+" + lat + "%2C" + lon + "&format=xml&polygon=1&addressdetails=1&limit=500", false);
+        Connect.setRequestHeader("Content-Type", "text/xml");
+        Connect.send(null);
+        // Place the response in an XML document.
+        var nominatimPayload = Connect.responseXML;
+
+        var places = nominatimPayload.getElementsByTagName("place");
+        var i;
+        for (i = 0; i < places.length; i++) {
+            var lonLat = new OpenLayers.LonLat(places[i].getAttribute("lon"), places[i].getAttribute("lat"))
+            .transform(
+                new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
+                map.getProjectionObject()); // to Spherical Mercator Projection.
+
+        	markers.addMarker(new OpenLayers.Marker(lonLat));
+      }
+  }
+  </script>
+</body></html>
