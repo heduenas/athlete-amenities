@@ -15,7 +15,8 @@
     var markers = new OpenLayers.Layer.Markers( "Markers" );
     map.addLayer(markers);
 
-    centerAt(-122.3086, 47.6410, /* showBlueDot= */ false);
+    var userPosition = null;
+    centerAt(-122.3086, 47.6410);
     addFeatures(-122.3086, 47.6410);
     map.events.register('moveend', map, onMoveEnd);
 
@@ -24,11 +25,12 @@
     /////////////////////////
 
     function setUserPosition(position) {
-      centerAt(position.coords.longitude, position.coords.latitude, /* showBlueDot= */ true);
-      addFeatures(position.coords.longitude, position.coords.latitude);
+        userPosition = position;
+        centerAt(position.coords.longitude, position.coords.latitude);
+        addFeatures(position.coords.longitude, position.coords.latitude);
     }
 
-    function centerAt(lon, lat, showBlueDot) {
+    function centerAt(lon, lat) {
         var lonLat = new OpenLayers.LonLat(lon, lat)
                 .transform(
 		                new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
@@ -36,11 +38,6 @@
           
         var zoom=16;
         map.setCenter (lonLat, zoom);
-        
-        if (showBlueDot) {
-            var blueDotIcon = new OpenLayers.Icon('bluedot.png');
-            markers.addMarker(new OpenLayers.Marker(lonLat, blueDotIcon));
-        }
     }
 
     function onMoveEnd() {
@@ -64,6 +61,7 @@
         // Place the response in an XML document.
         var nominatimPayload = Connect.responseXML;
 
+        markers.clearMarkers();
         var places = nominatimPayload.getElementsByTagName("place");
         var i;
         for (i = 0; i < places.length; i++) {
@@ -73,6 +71,16 @@
                 map.getProjectionObject()); // to Spherical Mercator Projection.
 
         	markers.addMarker(new OpenLayers.Marker(lonLat));
+
+        
+        if (userPosition != null) {
+            var blueDotIcon = new OpenLayers.Icon('bluedot.png');
+            var lonLat = new OpenLayers.LonLat(userPosition.coords.longitude, userPosition.coords.latitude)
+                .transform(
+		                new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
+		                map.getProjectionObject()); // to Spherical Mercator Projection.
+            markers.addMarker(new OpenLayers.Marker(lonLat, blueDotIcon));
+        }
       }
   }
   </script>
