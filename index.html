@@ -1,10 +1,10 @@
 <html>
 <head>
-    <title> Athlete Amenities near me </title>
+    <title>Athlete Amenities near me </title>
     <meta name="viewport" content="width=device-width, initial-scale=1" /> 
 </head>
 <body>
-  <h3>Navigate map or <a href = "javascript:navigator.geolocation.getCurrentPosition(setUserPosition);">go to my location</a>: </h3><br/>
+  <h3>Navigate map or <a href = "javascript:navigator.geolocation.getCurrentPosition(setUserPosition);">go to my location</a>:</h3><br/>
   <div id="mapdiv"></div>
   <script src="OpenLayers/OpenLayers.js"></script>
   <script>
@@ -51,37 +51,46 @@
     }
 
     function addFeatures(lon, lat) {
+        markers.clearMarkers();
+
+        if (userPosition != null) {
+            var lonLat = createAndTransformLonLat(userPosition.coords.longitude, userPosition.coords.latitude);
+
+            var blueDotIcon = new OpenLayers.Icon('bluedot.png');
+            markers.addMarker(new OpenLayers.Marker(lonLat, blueDotIcon));
+        }
+
+        addFeaturesOfType(lon, lat, 'toilet', 'toilets.svg');
+        addFeaturesOfType(lon, lat, 'drinking+water', 'drinkingtap.svg');
+    }
+
+    function addFeaturesOfType(lon, lat, nameInNominatim, iconFilename) {
         // Create a connection to the file.
         var Connect = new XMLHttpRequest();
         // Define which file to open and
         // send the request.
-        Connect.open("GET", "https://nominatim.openstreetmap.org/search?q=drinking+water+near+" + lat + "%2C" + lon + "&format=xml&polygon=1&addressdetails=1&limit=500", false);
+        Connect.open("GET", "https://nominatim.openstreetmap.org/search?q=" + nameInNominatim + "+near+" + lat + "%2C" + lon + "&format=xml&polygon=1&addressdetails=1&limit=500", false);
         Connect.setRequestHeader("Content-Type", "text/xml");
         Connect.send(null);
         // Place the response in an XML document.
         var nominatimPayload = Connect.responseXML;
 
-        markers.clearMarkers();
         var places = nominatimPayload.getElementsByTagName("place");
         var i;
         for (i = 0; i < places.length; i++) {
-            var lonLat = new OpenLayers.LonLat(places[i].getAttribute("lon"), places[i].getAttribute("lat"))
-            .transform(
-                new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
-                map.getProjectionObject()); // to Spherical Mercator Projection.
+            var lonLat = new createAndTransformLonLat(places[i].getAttribute("lon"), places[i].getAttribute("lat"));
 
-        	markers.addMarker(new OpenLayers.Marker(lonLat));
-
-        
-        if (userPosition != null) {
-            var blueDotIcon = new OpenLayers.Icon('bluedot.png');
-            var lonLat = new OpenLayers.LonLat(userPosition.coords.longitude, userPosition.coords.latitude)
-                .transform(
-		                new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
-		                map.getProjectionObject()); // to Spherical Mercator Projection.
-            markers.addMarker(new OpenLayers.Marker(lonLat, blueDotIcon));
+            var featureIcon = new OpenLayers.Icon(iconFilename);
+            markers.addMarker(new OpenLayers.Marker(lonLat, featureIcon));
         }
-      }
-  }
+    }
+
+    function createAndTransformLonLat(lon, lat) {
+        return new OpenLayers.LonLat(lon, lat)
+                .transform(
+                        new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
+                        map.getProjectionObject()); // to Spherical Mercator Projection.
+    }
   </script>
+<p> Map icons CC-0 from <a href="http://www.sjjb.co.uk/mapicons">SJJB Management</a>
 </body></html>
