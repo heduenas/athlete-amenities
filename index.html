@@ -1,96 +1,41 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Athlete Amenities near me </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+    <title>Athlete Amenities</title>
+    <script>
+        function redirectToMap(latitude, longitude) {
+            const url = `https://overpass-turbo.eu/map.html?Q=%0A%0A%0A%0A%0A%0A%0A%0A%0A%0A%0A%0A%0A%0A%0A%28%0A++node%5Bamenity%3Dtoilets%5D%28around%3A50000%2C${latitude}%2C${longitude}%29%3B%0A++node%5Bamenity%3Ddrinking_water%5D%28around%3A50000%2C${latitude}%2C${longitude}%29%3B%0A%29%3B%0Aout+center%3B%7B%7Bstyle%3A+%0A++node%5Bamenity%3Ddrinking_water%5D+%7B%0A++%09icon-image%3A+url%28%22https%3A%2F%2Fheduenas.github.io%2Fathlete-amenities%2Fdrinkingtap.svg%22%29%3B%0A++%09icon-width%3A+18%3B%0A++%7D%0A%0A++node%5Bamenity%3Dtoilets%5D+%7B%0A++++icon-image%3A+url%28%22https%3A%2F%2Fheduenas.github.io%2Fathlete-amenities%2Ftoilets.svg%22%29%3B%0A++%09icon-width%3A+18%3B%0A++%7D%0A+%7D%7D`;
+
+            window.location.href = url;
+        }
+
+        function redirectToDefault(error) {
+        		console.error("Error getting user location:", error);
+            
+            const defaultLatitude = '47.66';
+            const defaultLongitude = '-122.37';
+
+            redirectToMap(defaultLatitude, defaultLongitude);
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        redirectToMap(latitude, longitude);
+                    },
+                    redirectToDefault
+                );
+            } else {
+                redirectToDefault();
+            }
+        }
+
+        window.onload = getLocation;
+    </script>
 </head>
 <body>
-  <h3>Navigate map or <a href = "javascript:navigator.geolocation.getCurrentPosition(setUserPosition);">go to my location</a>:</h3><br/>
-  <div id="mapdiv"></div>
-  <script src="OpenLayers/OpenLayers.js"></script>
-  <script>
-    map = new OpenLayers.Map("mapdiv");
-
-    map.addLayer(new OpenLayers.Layer.OSM());
-
-    var markers = new OpenLayers.Layer.Markers( "Markers" );
-    map.addLayer(markers);
-
-    var userPosition = null;
-    centerAt(-122.3086, 47.6410);
-    addFeatures(-122.3086, 47.6410);
-    map.events.register('moveend', map, onMoveEnd);
-
-    /////////////////////////
-    // Function definitions:
-    /////////////////////////
-
-    function setUserPosition(position) {
-        userPosition = position;
-        centerAt(position.coords.longitude, position.coords.latitude);
-        addFeatures(position.coords.longitude, position.coords.latitude);
-    }
-
-    function centerAt(lon, lat) {
-        var lonLat = new OpenLayers.LonLat(lon, lat)
-                .transform(
-		                new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
-		                map.getProjectionObject()); // to Spherical Mercator Projection.
-          
-        var zoom=16;
-        map.setCenter (lonLat, zoom);
-    }
-
-    function onMoveEnd() {
-        var lonLat = map.getCenter()
-          .transform(
-            map.getProjectionObject(), // from Spherical Mercator Projection
-            new OpenLayers.Projection("EPSG:4326"), // to WGS 1984
-            );
-
-    	addFeatures(lonLat.lon, lonLat.lat);
-    }
-
-    function addFeatures(lon, lat) {
-        markers.clearMarkers();
-
-        if (userPosition != null) {
-            var lonLat = createAndTransformLonLat(userPosition.coords.longitude, userPosition.coords.latitude);
-
-            var blueDotIcon = new OpenLayers.Icon('bluedot.png');
-            markers.addMarker(new OpenLayers.Marker(lonLat, blueDotIcon));
-        }
-
-        addFeaturesOfType(lon, lat, 'toilet', 'toilets.svg');
-        addFeaturesOfType(lon, lat, 'drinking+water', 'drinkingtap.svg');
-    }
-
-    function addFeaturesOfType(lon, lat, nameInNominatim, iconFilename) {
-        // Create a connection to the file.
-        var Connect = new XMLHttpRequest();
-        // Define which file to open and
-        // send the request.
-        Connect.open("GET", "https://nominatim.openstreetmap.org/search?q=" + nameInNominatim + "+near+" + lat + "%2C" + lon + "&format=xml&polygon=1&addressdetails=1&limit=500", false);
-        Connect.setRequestHeader("Content-Type", "text/xml");
-        Connect.send(null);
-        // Place the response in an XML document.
-        var nominatimPayload = Connect.responseXML;
-
-        var places = nominatimPayload.getElementsByTagName("place");
-        var i;
-        for (i = 0; i < places.length; i++) {
-            var lonLat = new createAndTransformLonLat(places[i].getAttribute("lon"), places[i].getAttribute("lat"));
-
-            var featureIcon = new OpenLayers.Icon(iconFilename);
-            markers.addMarker(new OpenLayers.Marker(lonLat, featureIcon));
-        }
-    }
-
-    function createAndTransformLonLat(lon, lat) {
-        return new OpenLayers.LonLat(lon, lat)
-                .transform(
-                        new OpenLayers.Projection("EPSG:4326"), // Transform from WGS 1984
-                        map.getProjectionObject()); // to Spherical Mercator Projection.
-    }
-  </script>
-<p> Map icons CC-0 from <a href="http://www.sjjb.co.uk/mapicons">SJJB Management</a>
-</body></html>
+</body>
+</html>
