@@ -26,18 +26,6 @@
     // Query the amenities and add markers to the map
     function queryAmenities(center) {
       var query = '[out:json][timeout:25];\n' +
-        '{{style:\n' +
-        '  node[amenity=drinking_water] {\n' +
-        '    icon-image: url("https://heduenas.github.io/athlete-amenities/drinkingtap.svg");\n' +
-        '    icon-width: 18;\n' +
-        '  }\n' +
-        '}}\n' +
-        '{{style:\n' +
-        '  node[amenity=toilets] {\n' +
-        '    icon-image: url("https://heduenas.github.io/athlete-amenities/toilets.svg");\n' +
-        '    icon-width: 18;\n' +
-        '  }\n' +
-        '}}\n' +
         '(\n' +
         '  node[amenity=toilets](around:50000,' + center + ');\n' +
         '  node[amenity=drinking_water](around:50000,' + center + ');\n' +
