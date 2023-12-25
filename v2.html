@@ -52,8 +52,8 @@
         var nodes = data.elements;
         for (var i = 0; i < nodes.length; i++) {
           var node = nodes[i];
-          var lat = node.center.lat;
-          var lon = node.center.lon;
+          var lat = node.lat;
+          var lon = node.lon;
           var marker = L.marker([lat, lon]).addTo(map);
         }
       })
