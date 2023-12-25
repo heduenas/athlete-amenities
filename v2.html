@@ -43,9 +43,9 @@
 
     <script>
       var map = L.map('map').setView([53.079, 8.81308], 14);
-      L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
       function buildOverpassApiUrl(map, overpassQuery) {
@@ -54,7 +54,7 @@
         var wayQuery = 'way[' + overpassQuery + '](' + bounds + ');';
         var relationQuery = 'relation[' + overpassQuery + '](' + bounds + ');';
         var query = '?data=[out:json][timeout:15];(' + nodeQuery + wayQuery + relationQuery + ');out body geom;';
-        var baseUrl = 'http://overpass-api.de/api/interpreter';
+        var baseUrl = 'https://overpass-api.de/api/interpreter';
         var resultUrl = baseUrl + query;
         return resultUrl;
       }
