@@ -50,6 +50,7 @@
         body: query
       })
       .then(function(response) {
+        log(response.json());
         return response.json();
       })
       .then(function(data) {
