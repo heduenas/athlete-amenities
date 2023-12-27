@@ -37,7 +37,7 @@
 
 (
   ${this.selectedAmenities
-            .map(amenity => `node[amenity=${amenity}](around:50000,${this.latitude},${this.longitude});`)
+            .map(amenity => `node[amenity=${amenity}](around:10000,${this.latitude},${this.longitude});`)
             .join('\n  ')}
 );
 out center;{{style: 
