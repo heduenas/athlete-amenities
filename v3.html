@@ -11,8 +11,7 @@
       <label v-for="amenity in amenities" :key="amenity.value">
         <input type="checkbox" v-model="selectedAmenities" :value="amenity.value">
         {{ amenity.label }}
-      </label><br><br>
-      <button type="submit">Generate URL</button>
+      </label><br>
     </form>
 
     <iframe :src="encodedURL" id="map-iframe" style = "width: 100%; height: 90vh;" frameborder="0" allowfullscreen>     </iframe>
@@ -38,7 +37,7 @@
 
 (
   ${this.selectedAmenities
-            .map(amenity => `node[amenity=${amenity}](around:50000,20.657763380425443,-103.30710411071779);`)
+            .map(amenity => `node[amenity=${amenity}](around:50000,${this.latitude},${this.longitude});`)
             .join('\n  ')}
 );
 out center;{{style: 
