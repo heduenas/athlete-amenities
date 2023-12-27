@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Amenities</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <form @submit.prevent="generateURL">
+      <label v-for="amenity in amenities" :key="amenity.value">
+        <input type="checkbox" v-model="selectedAmenities" :value="amenity.value">
+        {{ amenity.label }}
+      </label><br><br>
+      <button type="submit">Generate URL</button>
+    </form>
+
+    <iframe :src="encodedURL" id="map-iframe" style = "width: 100%; height: 90vh;" frameborder="0" allowfullscreen>     </iframe>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        amenities: [
+          { label: 'Toilets', value: 'toilets' },
+          { label: 'Drinking Water', value: 'drinking_water' },
+          { label: 'Bench', value: 'bench' },
+          { label: 'Museum', value: 'museum' }
+        ],
+        selectedAmenities: []
+      },
+      computed: {
+        encodedURL: function() {
+          const urlString = `[out:json][timeout:25];
+
+(
+  ${this.selectedAmenities
+            .map(amenity => `node[amenity=${amenity}](around:50000,20.657763380425443,-103.30710411071779);`)
+            .join('\n  ')}
+);
+out center;{{style: 
+  ${this.selectedAmenities
+            .map(amenity => `node[amenity=${amenity}] {
+    icon-image: url("https://heduenas.github.io/athlete-amenities/${amenity}.svg");
+    icon-width: 18;
+  }`)
+            .join('\n\n  ')}
+}}`;
+
+          return 'https://overpass-turbo.eu/map.html?Q=' + encodeURIComponent(urlString);
+        }
+      },
+      methods: {
+        generateURL: function() {
+          // Do something with the encoded URL if needed
+        }
+      }
+    });
+  </script>
+</body>
+</html>
