@@ -60,8 +60,8 @@ out center;{{style:
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     position => {
-                        latitude = position.coords.latitude;
-                        longitude = position.coords.longitude;
+                        this.latitude = position.coords.latitude;
+                        this.longitude = position.coords.longitude;
                     },
                 );
             }
