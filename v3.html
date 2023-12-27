@@ -13,6 +13,7 @@
         {{ amenity.label }}
       </label><br>
     </form>
+    <a :href="overpassTurboUrl">See in Overpass</a>
 
     <iframe :src="encodedURL" id="map-iframe" style = "width: 100%; height: 90vh;" frameborder="0" allowfullscreen>     </iframe>
   </div>
@@ -32,7 +33,7 @@
         longitude: '-122.37',
       },
       computed: {
-        encodedURL: function() {
+        encodedQuery: function () {
           const urlString = `[out:json][timeout:25];
 
 (
@@ -49,8 +50,15 @@ out center;{{style:
             .join('\n\n  ')}
 }}`;
 
-          return 'https://overpass-turbo.eu/map.html?Q=' + encodeURIComponent(urlString);
+          return encodeURIComponent(urlString);
         }
+        encodedURL: function() {
+
+          return 'https://overpass-turbo.eu/map.html?Q=' + this.encodedQuery();
+        },
+        overpassTurboUrl: function() {
+          return "https://overpass-turbo.eu/Q=" + this.encodedQuery();
+        },
       },
       mounted: function() {
         this.getLocation();
