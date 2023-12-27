@@ -11,9 +11,9 @@
       <label v-for="amenity in amenities" :key="amenity.value">
         <input type="checkbox" v-model="selectedAmenities" :value="amenity.value">
         {{ amenity.label }}
-      </label><br>
+      </label>
+      <a :href="overpassTurboUrl" target="_blank">See in Overpass</a>
     </form>
-    <a :href="overpassTurboUrl">See in Overpass</a>
 
     <iframe :src="encodedURL" id="map-iframe" style = "width: 100%; height: 90vh;" frameborder="0" allowfullscreen>     </iframe>
   </div>
@@ -57,7 +57,7 @@ out center;{{style:
           return 'https://overpass-turbo.eu/map.html?Q=' + this.encodedQuery;
         },
         overpassTurboUrl: function() {
-          return "https://overpass-turbo.eu/Q=" + this.encodedQuery;
+          return "https://overpass-turbo.eu/?Q=" + this.encodedQuery;
         },
       },
       mounted: function() {
