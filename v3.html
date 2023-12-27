@@ -28,7 +28,9 @@
           { label: 'Bench', value: 'bench' },
           { label: 'Museum', value: 'museum' }
         ],
-        selectedAmenities: []
+        selectedAmenities: [],
+        latitude: '47.66',
+        longitude: '-122.37',
       },
       computed: {
         encodedURL: function() {
@@ -49,6 +51,21 @@ out center;{{style:
 }}`;
 
           return 'https://overpass-turbo.eu/map.html?Q=' + encodeURIComponent(urlString);
+        }
+      },
+      mounted: function() {
+        this.getLocation();
+      },
+      methods: {
+        getLocation: function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        latitude = position.coords.latitude;
+                        longitude = position.coords.longitude;
+                    },
+                );
+            }
         }
       }
     });
